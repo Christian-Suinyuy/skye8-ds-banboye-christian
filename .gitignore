@@ -2,3 +2,5 @@ venv
 .env
 data
 document
+*.pcy
+__pycache__/
