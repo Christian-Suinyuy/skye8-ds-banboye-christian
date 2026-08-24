@@ -16,16 +16,6 @@ CREATE TABLE sessions (
 	network varchar(15) NOT NULL
 );
 
-CREATE TABLE evaluation (
-	eval_id varchar(12) PRIMARY KEY,
-	call_id varchar(12) NOT NULL,
-	rubric varchar(30) NOT NULL,
-	verdict varchar(5) NOT NULL,
-	score decimal(1,4) NOT NULL,
-	evaluator varchar(20) NOT NULL,
-	evaluated_at timestamp NOT NULL
-);
-
 CREATE TABLE llm_calls (
 	call_id varchar(15) PRIMARY KEY,
 	session_id varchar(15) NOT NULL,
@@ -39,6 +29,28 @@ CREATE TABLE llm_calls (
 	status varchar(20) NOT NULL,
 	logged_cost_usd decimal(1,30),
 	called_at timestamp NOT NULL,
-	attempt_no int NOT NULL
-)
+	attempt_no int NOT NULL,
+	FOREIGN KEY(model) REFERENCES model_pricing(model)
+);
+
+ALTER TABLE llm_calls
+	ADD CONSTRAINT fk_model_session FOREIGN KEY (session_id) REFERENCES sessions(session_id);
+
+CREATE TABLE evaluation (
+	eval_id varchar(12) PRIMARY KEY,
+	call_id varchar(15) NOT NULL REFERENCES llm_calls(call_id),
+	rubric varchar(30) NOT NULL,
+	verdict varchar(5) NOT NULL,
+	score decimal(1,4) NOT NULL,
+	evaluator varchar(20) NOT NULL,
+	evaluated_at timestamp NOT NULL
+);
+
+ALTER TABLE llm_calls
+	ADD CONSTRAINT chk_min_lenght_0 CHECK (
+		prompt_tokens >= 0 AND
+		completion_tokens >= 0
+	)
+
+
 
