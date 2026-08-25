@@ -1,7 +1,7 @@
 CREATE TABLE model_pricing (
 	model VARCHAR(30) PRIMARY KEY,
 	prompt_usd_per_token Decimal,
-	completion_usd_per_token Decimal(1, 30),
+	completion_usd_per_token Decimal(20, 12),
 	effective_from Date
 );
 
@@ -27,7 +27,7 @@ CREATE TABLE llm_calls (
 	cache_hit bool NOT NULL,
 	latency_ms int NOT NULL,
 	status varchar(20) NOT NULL,
-	logged_cost_usd decimal(1,30),
+	logged_cost_usd decimal(20,12),
 	called_at timestamp NOT NULL,
 	attempt_no int NOT NULL,
 	FOREIGN KEY(model) REFERENCES model_pricing(model)
@@ -41,7 +41,7 @@ CREATE TABLE evaluation (
 	call_id varchar(15) NOT NULL REFERENCES llm_calls(call_id),
 	rubric varchar(30) NOT NULL,
 	verdict varchar(5) NOT NULL,
-	score decimal(1,4) NOT NULL,
+	score decimal(5,4) NOT NULL,
 	evaluator varchar(20) NOT NULL,
 	evaluated_at timestamp NOT NULL
 );
