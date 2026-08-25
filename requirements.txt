@@ -1,5 +1,8 @@
 pandas
 python-dotenv
+psycopg[binary]
+seaborn
+matplotlib
 
 pytest
 ruff
