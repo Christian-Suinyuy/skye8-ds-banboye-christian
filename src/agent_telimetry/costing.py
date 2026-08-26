@@ -26,14 +26,21 @@ def calculate_actual_cost(
     completion_tokens: Decimal,
     input_tokens: Decimal,
     cache_status: bool = False,
+    status: str = "success",
 ) -> Decimal:
+    if status == "rate_limited":
+        return Decimal("0")
+    cache_discount = Decimal("0.5")
     token_price = get_model_completion_cost(model)
-    if cache_status:
-        return Decimal(0)
 
     completion_cost = Decimal(completion_tokens) * Decimal(
         token_price["completion_price"]
     )
 
     input_cost = Decimal(input_tokens) * Decimal(token_price["prompt_price"])
+
+    # apply discount if we have a cached request
+    if cache_status:
+        input_cost = input_cost * cache_discount
+
     return completion_cost + input_cost
