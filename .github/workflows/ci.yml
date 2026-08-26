@@ -10,6 +10,24 @@ jobs:
     test-and-lint:
         runs-on: ubuntu-latest
 
+        services:
+            postgres:
+                image: postgres:16
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_DB: agent_telimetry
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready -U postgres -d agent_telimetry"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        env:
+            DATABASE_STRING: postgresql://postgres:postgres@localhost:5432/agent_telimetry
+
         steps:
             - name: Check out repository
               uses: actions/checkout@v4
@@ -28,6 +46,14 @@ jobs:
             - name: Run Linter
               run: |
                 ruff check .
+
+            - name: Create database schema
+              run: |
+                PGPASSWORD=postgres psql \
+                  -h localhost \
+                  -U postgres \
+                  -d agent_telimetry \
+                  -f src/agent_telimetry/sql/schema.sql
 
             - name: Run Tests
               run: | 
