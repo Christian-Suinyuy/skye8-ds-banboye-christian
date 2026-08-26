@@ -1,11 +1,8 @@
 import os
 from decimal import Decimal
 
-import pandas as pd
-
 # Get the directory of this file and construct the path to the data
 current_dir = os.path.dirname(os.path.abspath(__file__))
-df = pd.read_csv(os.path.join(current_dir, "data", "raw", "model_pricing.csv"))
 
 model_pricing = {
     "mlg-translate-sm": {"prompt_price": "1.5e-07", "completion_price": "6e-07"},
@@ -29,14 +26,21 @@ def calculate_actual_cost(
     completion_tokens: Decimal,
     input_tokens: Decimal,
     cache_status: bool = False,
+    status: str = "success",
 ) -> Decimal:
+    if status == "rate_limited":
+        return Decimal("0")
+    cache_discount = Decimal("0.5")
     token_price = get_model_completion_cost(model)
-    if cache_status:
-        return Decimal(0)
 
     completion_cost = Decimal(completion_tokens) * Decimal(
         token_price["completion_price"]
     )
 
     input_cost = Decimal(input_tokens) * Decimal(token_price["prompt_price"])
+
+    # apply discount if we have a cached request
+    if cache_status:
+        input_cost = input_cost * cache_discount
+
     return completion_cost + input_cost
