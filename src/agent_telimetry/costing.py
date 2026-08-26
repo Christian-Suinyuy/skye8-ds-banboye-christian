@@ -1,11 +1,8 @@
 import os
 from decimal import Decimal
 
-import pandas as pd
-
 # Get the directory of this file and construct the path to the data
 current_dir = os.path.dirname(os.path.abspath(__file__))
-df = pd.read_csv(os.path.join(current_dir, "data", "raw", "model_pricing.csv"))
 
 model_pricing = {
     "mlg-translate-sm": {"prompt_price": "1.5e-07", "completion_price": "6e-07"},
