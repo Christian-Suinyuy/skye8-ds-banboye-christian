@@ -9,11 +9,6 @@ connection_string = os.getenv("DATABASE_STRING")
 
 connection = psycopg.connect(connection_string or "")
 
-model_pricing = pd.read_csv("./src/agent_telimetry/data/raw/model_pricing.csv")
-sessions = pd.read_csv("./src/agent_telimetry/data/raw/sessions.csv")
-calls = pd.read_csv("./src/agent_telimetry/data/cleaned/llm_calls.csv", index_col=0)
-evaluations = pd.read_csv("./src/agent_telimetry/data/raw/evaluations.csv")
-
 
 def parse_timestamp(value: object) -> object:
     # if pd.isna(value):
@@ -27,6 +22,10 @@ def parse_timestamp(value: object) -> object:
 
 
 def load_model_pricing(model_pricing: pd.DataFrame) -> int:
+    with connection.cursor() as cur:
+        cur.execute("TRUNCATE TABLE model_pricing CASCADE;")
+    connection.commit()
+
     print("loading model pricing...")
     df = model_pricing.copy()
     df["model"] = df["model"].str.lower()
@@ -47,10 +46,17 @@ def load_model_pricing(model_pricing: pd.DataFrame) -> int:
 
         rows_affected += cur.rowcount
 
+    connection.commit()
+
     return rows_affected
 
 
 def load_sessions(sessions: pd.DataFrame) -> int:
+    # clear table first before loading
+    with connection.cursor() as cur:
+        cur.execute("TRUNCATE TABLE sessions CASCADE;")
+    connection.commit()
+
     print("loading sessions...")
     df = sessions.copy()
     df["started_at"] = df["started_at"].map(parse_timestamp)
@@ -76,6 +82,10 @@ def load_sessions(sessions: pd.DataFrame) -> int:
 
 def load_calls(calls: pd.DataFrame) -> int:
     """handles insertions line by line so we can catch a contraint arror"""
+
+    with connection.cursor() as cur:
+        cur.execute("TRUNCATE TABLE llm_calls CASCADE;")
+    connection.commit()
     print("loading calls...")
     df = calls.copy()
     df["model"] = df["model"].str.lower()
@@ -118,6 +128,10 @@ def load_evaluations(evaluations: pd.DataFrame) -> int:
     """Has call_id wich does not exist in llm_call
     table and voilate foreign key constraints"""
 
+    with connection.cursor() as cur:
+        cur.execute("TRUNCATE TABLE evaluation CASCADE;")
+    connection.commit()
+
     print("loading evaluations...")
     df = evaluations.copy()
     df["evaluated_at"] = df["evaluated_at"].map(parse_timestamp)
@@ -152,6 +166,11 @@ def load_evaluations(evaluations: pd.DataFrame) -> int:
 
 
 def load_all() -> None:
+    model_pricing = pd.read_csv("./src/agent_telimetry/data/raw/model_pricing.csv")
+    sessions = pd.read_csv("./src/agent_telimetry/data/raw/sessions.csv")
+    calls = pd.read_csv("./src/agent_telimetry/data/cleaned/llm_calls.csv", index_col=0)
+    evaluations = pd.read_csv("./src/agent_telimetry/data/raw/evaluations.csv")
+
     """Load tables in foreign-key dependency order."""
     if connection is None:
         raise RuntimeError("DATABASE_STRING must be set before loading data")

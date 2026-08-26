@@ -16,21 +16,7 @@ python -m pip install -e ".[dev]"
 
 ## Quickstart
 
-The cost calculator can be used without a database:
-
-```python
-from decimal import Decimal
-
-from agent_telimetry.costing import calculate_actual_cost
-
-cost = calculate_actual_cost(
-	model="mlg-asr-align",
-	input_tokens=Decimal("1328"),
-	completion_tokens=Decimal("413"),
-)
-
-print(cost)
-```
+The cost calculator can be used without a database or csv.
 
 Run the tests from the project root with:
 
