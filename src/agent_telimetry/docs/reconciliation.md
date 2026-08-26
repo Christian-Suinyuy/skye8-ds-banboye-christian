@@ -4,7 +4,11 @@
 
 * for some reason rate limited calls still have a completion token count wich should not be possible
 
-* Billed rate limited calls = 423
-* wrongly billed calls due to cache = 4565
+* Billed rate limited calls = 2233
+* wrongly billed calls due to cache = 4557
+*purely wrong computations = 2044
+* correct computations = 1020
 
-* the all columns of the dataframe to 5 decimal places. the math cannot properly be accounted for becasue of the number of decimal places in the logged cost and the computed "Decimal" cost in 6 decimal places. so apparently all logged costs are frctionaly wrong
+* all entries of the dataframe for logged cost are to 5 decimal places. the math cannot properly be accounted for becasue of the number of decimal places in the logged cost and the computed "Decimal" cost in 6 decimal places. so apparently all logged costs are frctionaly wrong. THE VALUES ABOVE WERE GOTTEN BY ROUNDING MY CALCULATED VALUES DOWN TO 5 DECIMAL PLACES BEFORE COMPARING.
+
+@exploration.ipynb
