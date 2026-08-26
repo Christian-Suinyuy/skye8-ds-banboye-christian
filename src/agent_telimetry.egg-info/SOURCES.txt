@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/agent_telimetry/__init__.py
+src/agent_telimetry/costing.py
+src/agent_telimetry/loader.py
+src/agent_telimetry.egg-info/PKG-INFO
+src/agent_telimetry.egg-info/SOURCES.txt
+src/agent_telimetry.egg-info/dependency_links.txt
+src/agent_telimetry.egg-info/requires.txt
+src/agent_telimetry.egg-info/top_level.txt
+src/agent_telimetry/tests/__init__.py
+src/agent_telimetry/tests/test_costing.py

@@ -1,0 +1,12 @@
+pandas
+python-dotenv
+psycopg[binary]
+seaborn
+matplotlib
+
+[dev]
+black>=26.5.1
+mypy>=2.3.1
+pre-commit>=4.6.2
+pytest>=9.1.1
+ruff>=0.16.3

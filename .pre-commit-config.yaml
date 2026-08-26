@@ -18,3 +18,12 @@ repos:
     hooks:
       - id: mypy
         name: "runing type check with my py"
+  
+  - repo: local
+    hooks:
+      - id: pytest
+        name: "running pytest"
+        entry: venv/Scripts/python.exe -m pytest
+        language: system
+        types: [python]
+        pass_filenames: false
