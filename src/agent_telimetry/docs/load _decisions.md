@@ -1,0 +1,1 @@
+For calls whos session ids where not found in the reference table, i left them out for consistency purposes, and was told to enforce forein key constraints.
