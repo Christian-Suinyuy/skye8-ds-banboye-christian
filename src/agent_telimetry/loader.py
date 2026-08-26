@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 import pandas as pd
 import psycopg
@@ -9,6 +8,11 @@ load_dotenv()
 connection_string = os.getenv("DATABASE_STRING")
 
 connection = psycopg.connect(connection_string or "")
+
+model_pricing = pd.read_csv("./src/agent_telimetry/data/raw/model_pricing.csv")
+sessions = pd.read_csv("./src/agent_telimetry/data/raw/sessions.csv")
+calls = pd.read_csv("./src/agent_telimetry/data/cleaned/llm_calls.csv", index_col=0)
+evaluations = pd.read_csv("./src/agent_telimetry/data/raw/evaluations.csv")
 
 
 def parse_timestamp(value: object) -> object:
@@ -22,9 +26,9 @@ def parse_timestamp(value: object) -> object:
     return pd.to_datetime(value_text, format="mixed").to_pydatetime()
 
 
-def load_model_pricing(raw_dir: str) -> int:
+def load_model_pricing(model_pricing: pd.DataFrame) -> int:
     print("loading model pricing...")
-    df = pd.read_csv(Path(raw_dir) / "model_pricing.csv")
+    df = model_pricing.copy()
     df["model"] = df["model"].str.lower()
 
     rows_affected = 0
@@ -46,9 +50,9 @@ def load_model_pricing(raw_dir: str) -> int:
     return rows_affected
 
 
-def load_sessions(raw_dir: str) -> int:
+def load_sessions(sessions: pd.DataFrame) -> int:
     print("loading sessions...")
-    df = pd.read_csv(Path(raw_dir) / "sessions.csv")
+    df = sessions.copy()
     df["started_at"] = df["started_at"].map(parse_timestamp)
 
     rows_affected = 0
@@ -70,10 +74,10 @@ def load_sessions(raw_dir: str) -> int:
     return rows_affected
 
 
-def load_calls(raw_dir: str) -> int:
+def load_calls(calls: pd.DataFrame) -> int:
     """handles insertions line by line so we can catch a contraint arror"""
     print("loading calls...")
-    df = pd.read_csv(Path(raw_dir) / "llm_calls.csv", index_col=0)
+    df = calls.copy()
     df["model"] = df["model"].str.lower()
     df["called_at"] = df["called_at"].map(parse_timestamp)
 
@@ -97,10 +101,10 @@ def load_calls(raw_dir: str) -> int:
                         """,
                         tuple(row),
                     )
+                rows_affected += cur.rowcount
             except Exception as e:
                 print(e)
                 foreign_key_voilations += 1
-                rows_affected += cur.rowcount
 
     print(
         f"""number of rows that voilated forein key
@@ -110,12 +114,12 @@ def load_calls(raw_dir: str) -> int:
     return rows_affected
 
 
-def load_evaluations(raw_dir: str) -> int:
+def load_evaluations(evaluations: pd.DataFrame) -> int:
     """Has call_id wich does not exist in llm_call
     table and voilate foreign key constraints"""
 
     print("loading evaluations...")
-    df = pd.read_csv(Path(raw_dir) / "evaluations.csv")
+    df = evaluations.copy()
     df["evaluated_at"] = df["evaluated_at"].map(parse_timestamp)
 
     forein_key_voilations = 0
@@ -135,9 +139,9 @@ def load_evaluations(raw_dir: str) -> int:
                         """,
                         tuple(row),
                     )
+                rows_affected += cur.rowcount
             except Exception:
                 forein_key_voilations += 1
-                rows_affected += cur.rowcount
 
     print(
         f"""number of rows that voilated forein key constraints
@@ -151,10 +155,10 @@ def load_all() -> None:
     """Load tables in foreign-key dependency order."""
     if connection is None:
         raise RuntimeError("DATABASE_STRING must be set before loading data")
-    load_model_pricing(raw_dir="./src/agent_telimetry/data/raw")
-    load_sessions(raw_dir="./src/agent_telimetry/data/raw")
-    load_calls(raw_dir="./src/agent_telimetry/data/cleaned")
-    load_evaluations(raw_dir="./src/agent_telimetry/data/raw")
+    load_model_pricing(model_pricing)
+    load_sessions(sessions)
+    load_calls(calls)
+    load_evaluations(evaluations)
     connection.commit()
 
 
