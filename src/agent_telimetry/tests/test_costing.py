@@ -15,9 +15,9 @@ def test_cost_calculation() -> None:
 
     result = calculate_actual_cost(
         model="mlg-tutor-lg",
-        input_tokens=Decimal(1338),
-        completion_tokens=Decimal(239),
+        input_tokens=Decimal("1298"),
+        completion_tokens=Decimal("5"),
         cache_status=True,
     )
 
-    assert result == Decimal(0)
+    assert result == Decimal("0.00073590")
