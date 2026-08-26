@@ -9,11 +9,6 @@ connection_string = os.getenv("DATABASE_STRING")
 
 connection = psycopg.connect(connection_string or "")
 
-model_pricing = pd.read_csv("./src/agent_telimetry/data/raw/model_pricing.csv")
-sessions = pd.read_csv("./src/agent_telimetry/data/raw/sessions.csv")
-calls = pd.read_csv("./src/agent_telimetry/data/cleaned/llm_calls.csv", index_col=0)
-evaluations = pd.read_csv("./src/agent_telimetry/data/raw/evaluations.csv")
-
 
 def parse_timestamp(value: object) -> object:
     # if pd.isna(value):
@@ -171,6 +166,11 @@ def load_evaluations(evaluations: pd.DataFrame) -> int:
 
 
 def load_all() -> None:
+    model_pricing = pd.read_csv("./src/agent_telimetry/data/raw/model_pricing.csv")
+    sessions = pd.read_csv("./src/agent_telimetry/data/raw/sessions.csv")
+    calls = pd.read_csv("./src/agent_telimetry/data/cleaned/llm_calls.csv", index_col=0)
+    evaluations = pd.read_csv("./src/agent_telimetry/data/raw/evaluations.csv")
+
     """Load tables in foreign-key dependency order."""
     if connection is None:
         raise RuntimeError("DATABASE_STRING must be set before loading data")

@@ -230,8 +230,6 @@ sessions_csv = pd.DataFrame(sessions_data)
 llm_calls_csv = pd.DataFrame(llm_calls_data)
 evaluation_csv = pd.DataFrame(evaluation_data)
 
-print(model_pricing_csv)
-
 
 def test_loads() -> None:
     results = load_model_pricing(model_pricing_csv)
@@ -245,6 +243,3 @@ def test_loads() -> None:
 
     results = load_evaluations(evaluation_csv)
     assert results == 3
-
-
-test_loads()
