@@ -3,6 +3,7 @@ python-dotenv
 psycopg[binary]
 seaborn
 matplotlib
+ipykernel
 
 pytest
 ruff
