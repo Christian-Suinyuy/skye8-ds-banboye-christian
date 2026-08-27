@@ -1,0 +1,18 @@
+# Data never enters this repository.
+data/
+*.csv
+*.parquet
+*.xlsx
+
+# Environments and secrets
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
