@@ -1,0 +1,2 @@
+- creted a conflict by eddiing the readme file in the dev branch then editing it agian in the feature brnch then created a pull request.
+    - resolved this conflict by accepting just incomming changes. so it droped the courrent changes.
