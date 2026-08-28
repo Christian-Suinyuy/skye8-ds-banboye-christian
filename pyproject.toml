@@ -13,7 +13,8 @@ dependencies = [
 	"python-dotenv",
 	"psycopg[binary]",
 	"seaborn",
-    "matplotlib"
+    "matplotlib",
+	"ipykernel"
 ]
 
 [project.optional-dependencies]
