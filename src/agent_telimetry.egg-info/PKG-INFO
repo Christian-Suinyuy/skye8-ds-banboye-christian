@@ -1,0 +1,22 @@
+Metadata-Version: 2.4
+Name: agent-telimetry
+Version: 0.1.0
+Summary: Data cleaning and analysis utilities for agent telemetry.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pandas
+Requires-Dist: python-dotenv
+Requires-Dist: psycopg[binary]
+Requires-Dist: seaborn
+Requires-Dist: matplotlib
+Provides-Extra: dev
+Requires-Dist: black>=26.5.1; extra == "dev"
+Requires-Dist: mypy>=2.3.1; extra == "dev"
+Requires-Dist: pre-commit>=4.6.2; extra == "dev"
+Requires-Dist: pytest>=9.1.1; extra == "dev"
+Requires-Dist: ruff>=0.16.3; extra == "dev"
+
+![CI Status]( https://github.com/Christian-Suinyuy/skye8-ds-banboye-christian/actions/workflows/ci.yml/badge.svg)
+
+# skye8-ds-banboye-christian
+Personalized development roadmap for the Skye8 Data Science / ML - AI Internship. Focused on building AI Engineer skills, including version control, software engineering, SQL, machine learning, and LLM-powered systems.
