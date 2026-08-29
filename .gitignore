@@ -1,6 +1,31 @@
+<<<<<<< HEAD
 venv
 .env
 data
 document
 *.pcy
+<<<<<<< HEAD
 __pycache__/
+=======
+__pycache__/
+=======
+# Data never enters this repository.
+data/
+*.csv
+*.parquet
+*.xlsx
+
+# Environments and secrets
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+>>>>>>> submision/main
+>>>>>>> 2dd1fcf1d47611e4dc3cccb35922f957027e008c
