@@ -4,6 +4,9 @@ psycopg[binary]
 seaborn
 matplotlib
 ipykernel
+torch
+mlflow
+
 
 pytest
 ruff
