@@ -27,5 +27,8 @@ __pycache__/
 
 # OS
 .DS_Store
->>>>>>> submision/main
->>>>>>> 2dd1fcf1d47611e4dc3cccb35922f957027e008c
+
+mlruns
+Dummy_majority*
+mlflow_local.db
+Tuned_logis*
