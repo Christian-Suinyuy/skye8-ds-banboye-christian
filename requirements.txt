@@ -5,6 +5,7 @@ seaborn
 matplotlib
 ipykernel
 torch
+scikit-learn
 mlflow
 
 
