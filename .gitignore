@@ -29,6 +29,7 @@ __pycache__/
 .DS_Store
 
 mlruns
-Dummy_majority*
-mlflow_local.db
+# Dummy_majority*
+# mlflow*.db
 Tuned_logis*
+# mlflow.db

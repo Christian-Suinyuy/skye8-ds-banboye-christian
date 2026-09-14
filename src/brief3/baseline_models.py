@@ -1,25 +1,13 @@
 import mlflow
 import mlflow.sklearn
-import pandas as pd
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
-from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.model_selection import GridSearchCV
 
-from .pipeline import build_pipeline
+from .pipeline import build_pipeline, split
 
-df = pd.read_csv("src/brief3/data/raw/support_messages.csv")
-
-x = df.drop("intent", axis=1)
-y = df["intent"]
-
-x_train, x_temp, y_train, y_temp = train_test_split(
-    x, y, test_size=0.3, random_state=54, stratify=y
-)
-
-x_test, x_val, y_test, y_val = train_test_split(
-    x_temp, y_temp, test_size=0.5, random_state=54, stratify=y_temp
-)
+x_train, x_test, x_val, y_train, y_test, y_val = split()
 
 mlflow.set_experiment("message_classifier")
 
@@ -30,12 +18,14 @@ with mlflow.start_run(run_name="Dummy_classifier"):
 
     prediction = pipeline.predict(x_test)
     metrics = {
-        "recall": recall_score(y_test, prediction, average="macro", zero_division=0),
-        "precision": precision_score(
-            y_test, prediction, average="macro", zero_division=0
+        "recall": float(
+            recall_score(y_test, prediction, average="macro", zero_division=0)
         ),
-        "f1_macro": f1_score(prediction, y_test, average="macro"),
-        "f1_weighted": f1_score(y_test, prediction, average="weighted"),
+        "precision": float(
+            precision_score(y_test, prediction, average="macro", zero_division=0)
+        ),
+        "f1_macro": float(f1_score(prediction, y_test, average="macro")),
+        "f1_weighted": float(f1_score(y_test, prediction, average="weighted")),
     }
 
     mlflow.log_param("model", "DummyClassifier")
@@ -66,11 +56,13 @@ with mlflow.start_run(run_name="Logistic_Regression"):
 
     prediction = best.predict(x_test)
     metrics = {
-        "recall": recall_score(y_test, prediction, average="macro", zero_division=0),
-        "precision": precision_score(
-            y_test, prediction, average="macro", zero_division=0
+        "recall": float(
+            recall_score(y_test, prediction, average="macro", zero_division=0)
         ),
-        "f1_macro": f1_score(y_test, prediction, average="macro"),
+        "precision": float(
+            precision_score(y_test, prediction, average="macro", zero_division=0)
+        ),
+        "f1_macro": float(f1_score(y_test, prediction, average="macro")),
         "f1_weighted": f1_score(y_test, prediction, average="weighted"),
     }
 

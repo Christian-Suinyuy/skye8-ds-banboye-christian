@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import mlflow
 import mlflow.pytorch
-import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -14,29 +13,16 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 
-from .pipeline import column_transformer, label_encode
+from .pipeline import column_transformer, label_encode, split
 
 mlflow.set_experiment("message_classifier")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # load dataset and convert that to pytorch tensors
-df = pd.read_csv("src/brief3/data/raw/support_messages.csv")
-
-x = df.drop("intent", axis=1)
-y = df["intent"].to_numpy()
-
-
-x_train, x_temp, y_train, y_temp = train_test_split(
-    x, y, test_size=0.3, random_state=54, stratify=y
-)
-
-x_test, x_val, y_test, y_val = train_test_split(
-    x_temp, y_temp, test_size=0.5, random_state=54, stratify=y_temp
-)
+x_train, x_test, x_val, y_train, y_test, y_val = split()
 
 transformer = column_transformer()
 x_train = transformer.fit_transform(x_train)
@@ -134,7 +120,7 @@ with mlflow.start_run(run_name="nn_model"):
             "precision": precision_score(
                 y_test_tensors, predictions, average="macro", zero_division=0
             ),
-            "f1_macro": f1_score(predictions, y_test_tensors, average="macro"),
+            "f1_macro": float(f1_score(predictions, y_test_tensors, average="macro")),
             "f1_weighted": f1_score(y_test_tensors, predictions, average="weighted"),
         }
         mlflow.log_metrics(

@@ -1,6 +1,8 @@
+import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
@@ -41,3 +43,21 @@ def column_transformer(
     )
 
     return column_transform
+
+
+def split() -> (
+    tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, pd.Series]
+):
+    df = pd.read_csv("src/brief3/data/raw/support_messages.csv")
+
+    x = df.drop("intent", axis=1)
+    y = df["intent"]
+
+    x_train, x_temp, y_train, y_temp = train_test_split(
+        x, y, test_size=0.3, random_state=54, stratify=y
+    )
+
+    x_test, x_val, y_test, y_val = train_test_split(
+        x_temp, y_temp, test_size=0.5, random_state=54, stratify=y_temp
+    )
+    return x_train, x_test, x_val, y_train, y_test, y_val
