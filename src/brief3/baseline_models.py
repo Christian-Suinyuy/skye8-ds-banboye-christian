@@ -21,7 +21,7 @@ x_test, x_val, y_test, y_val = train_test_split(
     x_temp, y_temp, test_size=0.5, random_state=54, stratify=y_temp
 )
 
-mlflow.set_experiment("baseline_models")
+mlflow.set_experiment("message_classifier")
 
 with mlflow.start_run(run_name="Dummy_classifier"):
     model = DummyClassifier(strategy="most_frequent")
