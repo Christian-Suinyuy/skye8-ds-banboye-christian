@@ -9,6 +9,7 @@ scikit-learn
 mlflow
 openai
 groq
+transformers
 
 
 pytest
