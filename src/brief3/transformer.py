@@ -16,27 +16,24 @@ from torch.utils.data import DataLoader, TensorDataset
 from .pipeline import label_encode, split
 from .utils import encode_text, tokenizer
 
-x_train, x_test, x_val, y_train, y_test, y_val = split()
 
-vocab = tokenizer(x_train.message_text)
-x_train_tensor = encode_text(vocab=vocab, texts=x_train.message_text, max_lenght=20)
-x_test_tensor = encode_text(vocab=vocab, texts=x_test.message_text, max_lenght=20)
+def train_transformer(split_name: str = "default") -> None:
+    x_train, x_test, x_val, y_train, y_test, y_val = split(split_name=split_name)
 
-y_encoder = label_encode()
-y_train = y_encoder.fit_transform(y_train)
-y_test = y_encoder.transform(y_test)
+    vocab = tokenizer(x_train.message_text)
+    x_train_tensor = encode_text(vocab=vocab, texts=x_train.message_text, max_lenght=20)
+    x_test_tensor = encode_text(vocab=vocab, texts=x_test.message_text, max_lenght=20)
 
-y_train_tensor = torch.tensor(y_train, dtype=torch.long)
-y_test_tensor = torch.tensor(y_test, dtype=torch.long)
+    y_encoder = label_encode()
+    y_train = y_encoder.fit_transform(y_train)
+    y_test = y_encoder.transform(y_test)
 
-train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
-test_dataset = TensorDataset(x_train_tensor, y_train_tensor)
+    y_train_tensor = torch.tensor(y_train, dtype=torch.long)
+    y_test_tensor = torch.tensor(y_test, dtype=torch.long)
 
-train_loader = DataLoader(train_dataset, batch_size=100, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+    train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
+    train_loader = DataLoader(train_dataset, batch_size=100, shuffle=True)
 
-
-def transformer_classifier() -> None:
     class TransformerClassifier(nn.Module):
         def __init__(
             self,
@@ -45,7 +42,7 @@ def transformer_classifier() -> None:
             num_heads: int = 4,
             hidden_dim: int = 256,
             num_classes: int = 10,
-            num_layers: int = 1,
+            num_layers: int = 4,
         ) -> None:
             super().__init__()
 
@@ -78,7 +75,7 @@ def transformer_classifier() -> None:
     embedding_dim = 128
     num_heads = 4
     hidden_dim = 256
-    num_layers = 1
+    num_layers = 4
     num_classes = 10
     vocab_size = len(vocab)
 
@@ -102,6 +99,7 @@ def transformer_classifier() -> None:
         mlflow.log_params(
             {
                 "model": type(model).__name__,
+                "split_name": split_name,
                 "embedding_dim": embedding_dim,
                 "num_heads": num_heads,
                 "hidden_dim": hidden_dim,
@@ -186,4 +184,5 @@ def transformer_classifier() -> None:
         )
 
 
-transformer_classifier()
+if __name__ == "__main__":
+    train_transformer()

@@ -191,16 +191,6 @@ def get_prediction(message: str, model: str) -> ChatCompletion:
     return response
 
 
-x_train, x_test, x_val, y_train, y_test, y_val = split()
-
-x_test_20 = x_test.iloc[:40].copy()
-y_test_20 = y_test.iloc[:40].copy()
-
-encoder = label_encode()
-encoder.fit(y_train)
-
-
-# cleane the json files recieved into valid types for label encode and scoring
 def clean_label(raw: str) -> str:
     try:
         payload = json.loads(raw)
@@ -212,63 +202,79 @@ def clean_label(raw: str) -> str:
     return raw.strip()
 
 
-# start invoking the model in a loop getting the predictions
-model = "openai/gpt-oss-120b"
-mlflow.set_experiment("message_classifier")
-with mlflow.start_run(run_name="hosted_groq"):
-    predictions = []
-    start = time.perf_counter()
-    input_tokens = 0.0
-    output_tokens = 0.0
-    total_tokens = 0.0
+def evaluate_llm(
+    split_name: str = "default", model_name: str = "openai/gpt-oss-120b"
+) -> None:
+    x_train, x_test, x_val, y_train, y_test, y_val = split(split_name=split_name)
 
-    mlflow.log_param("model", f"{model}")
-    mlflow.log_param("prompt_variation", "few-shot")
+    x_test_20 = x_test.iloc[:40].copy()
+    y_test_20 = y_test.iloc[:40].copy()
 
-    for msg in x_test_20["message_text"]:
-        response = get_prediction(message=msg, model=model)
-        prediction = response.choices[0].message.content
-        predictions.append(prediction)
-        print(prediction)
+    encoder = label_encode()
+    encoder.fit(y_train)
 
-        if response.usage:
-            input_tokens += response.usage.prompt_tokens
-            output_tokens += response.usage.completion_tokens
-            total_tokens += response.usage.total_tokens
+    mlflow.set_experiment("message_classifier")
+    with mlflow.start_run(run_name="hosted_groq"):
+        predictions: list[str] = []
+        start = time.perf_counter()
+        input_tokens = 0.0
+        output_tokens = 0.0
+        total_tokens = 0.0
 
-    latency = time.perf_counter() - start
-    clean_predictions = [clean_label(p) for p in predictions]
-    compare = zip(clean_predictions, predictions)
+        mlflow.log_param("model", model_name)
+        mlflow.log_param("split_name", split_name)
+        mlflow.log_param("prompt_variation", "few-shot")
 
-    labelt = encoder.transform(clean_predictions)
+        for msg in x_test_20["message_text"]:
+            response = get_prediction(message=msg, model=model_name)
+            prediction = response.choices[0].message.content
+            predictions.append(prediction)
+            print(prediction)
 
-    # using mlflow to log matrices
-    metrics = {
-        "recall": recall_score(
-            y_test_20, clean_predictions, average="macro", zero_division=0
-        ),
-        "precision": precision_score(
-            y_test_20, clean_predictions, average="macro", zero_division=0
-        ),
-        "f1_macro": f1_score(
-            y_test_20, clean_predictions, average="macro", zero_division=0
-        ),
-        "f1_weighted": f1_score(
-            y_test_20, clean_predictions, average="weighted", zero_division=0
-        ),
-        "latency": latency,
-    }
+            if response.usage:
+                input_tokens += response.usage.prompt_tokens
+                output_tokens += response.usage.completion_tokens
+                total_tokens += response.usage.total_tokens
 
-    mlflow.log_params(
-        params={
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-            "total_tokens": total_tokens,
+        latency = time.perf_counter() - start
+        clean_predictions = [clean_label(p) for p in predictions]
+
+        metrics = {
+            "recall": float(
+                recall_score(
+                    y_test_20, clean_predictions, average="macro", zero_division=0
+                )
+            ),
+            "precision": float(
+                precision_score(
+                    y_test_20, clean_predictions, average="macro", zero_division=0
+                )
+            ),
+            "f1_macro": float(
+                f1_score(y_test_20, clean_predictions, average="macro", zero_division=0)
+            ),
+            "f1_weighted": float(
+                f1_score(
+                    y_test_20, clean_predictions, average="weighted", zero_division=0
+                )
+            ),
+            "latency": float(latency),
         }
-    )
 
-    mlflow.log_metrics(metrics)
+        mlflow.log_params(
+            params={
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": total_tokens,
+            }
+        )
 
-    mlflow.log_text(
-        str(confusion_matrix(y_test_20, clean_predictions)), "confusion_matrix.txt"
-    )
+        mlflow.log_metrics(metrics)
+
+        mlflow.log_text(
+            str(confusion_matrix(y_test_20, clean_predictions)), "confusion_matrix.txt"
+        )
+
+
+if __name__ == "__main__":
+    evaluate_llm()
