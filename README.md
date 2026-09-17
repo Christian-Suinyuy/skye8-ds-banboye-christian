@@ -14,11 +14,10 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-Run commands from the repository root so the Brief 3 dataset path resolves correctly. For local MLflow tracking with recent MLflow versions, configure the file store in the active PowerShell session:
+Run commands from the repository root so the Brief 3 dataset path resolves correctly. Use the local SQLite-backed MLflow store in the active PowerShell session:
 
 ```powershell
-$env:MLFLOW_TRACKING_URI = "file:./mlruns"
-$env:MLFLOW_ALLOW_FILE_STORE = "true"
+$env:MLFLOW_TRACKING_URI = "sqlite:///mlflow_local.db"
 ```
 
 The optional hosted LLM evaluation requires a `.env` file in the repository root:

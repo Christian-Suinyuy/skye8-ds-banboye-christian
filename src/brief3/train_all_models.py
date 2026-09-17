@@ -15,18 +15,13 @@ def run_model_training(
     split_name: str = "default",
 ) -> None:
     try:
+        print(f"training: {model_name}, with {split_name} split")
         training_fn(split_name)
         with mlflow.start_run(run_name=f"{model_name}_status"):
             mlflow.log_param("model", model_name)
             mlflow.log_param("split_name", split_name)
             mlflow.log_param("status", "success")
     except Exception as exc:
-        with mlflow.start_run(run_name=f"{model_name}_status"):
-            mlflow.log_param("model", model_name)
-            mlflow.log_param("split_name", split_name)
-            mlflow.log_param("status", "failed")
-            mlflow.log_param("error_type", type(exc).__name__)
-            mlflow.log_text(str(exc), f"{model_name}_error.txt")
         print(f"{model_name} failed for split '{split_name}': {exc}")
 
 

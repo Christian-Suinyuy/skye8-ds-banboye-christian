@@ -2,11 +2,10 @@
 
 All Brief 3 training functions accept a `split_name` argument. The available values are documented in [split.md](split.md). Each model writes metrics, parameters, and model artifacts to the MLflow experiment `message_classifier`.
 
-For a local file-backed run, set the tracking URI once in the active PowerShell session:
+For local tracking, use the SQLite backend once in the active PowerShell session:
 
 ```powershell
-$env:MLFLOW_TRACKING_URI = "file:./mlruns"
-$env:MLFLOW_ALLOW_FILE_STORE = "true"
+$env:MLFLOW_TRACKING_URI = "sqlite:///mlflow_local.db"
 ```
 
 ## Run one model
@@ -46,14 +45,14 @@ Run the same four models with a named split:
 python -c "from src.brief3.train_all_models import train_all_models; train_all_models('imbalance_aware')"
 ```
 
-The aggregate runner records a success or failure status run for each model. A failure is logged to MLflow with its exception type and an error text artifact before the next model is attempted.
+The aggregate runner records a success status run for each completed model. If a model fails, the exception is printed to the console and the next model is attempted.
 
 ## View MLflow runs
 
-Start the local MLflow UI from the repository root in a separate terminal:
+Start the local MLflow server from the repository root in a separate terminal:
 
 ```powershell
-mlflow ui --backend-store-uri ./mlruns --port 5000
+mlflow server --backend-store-uri sqlite:///mlflow_local.db --default-artifact-root ./mlruns --host 127.0.0.1 --port 5000
 ```
 
-Open <http://127.0.0.1:5000>, select the `message_classifier` experiment, and compare runs by `model` and `split_name`. Stop the UI with `Ctrl+C` when finished.
+Open <http://127.0.0.1:5000>, select the `message_classifier` experiment, and compare runs by `model` and `split_name`. Stop the server with `Ctrl+C` when finished.
