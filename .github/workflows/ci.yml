@@ -45,7 +45,7 @@ jobs:
 
             - name: Run Linter
               run: |
-                ruff check .
+                ruff check . --output-format=full
 
             - name: Create database schema
               run: |

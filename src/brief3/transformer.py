@@ -136,7 +136,7 @@ def train_transformer(split_name: str = "default") -> None:
                 optimizer.step()
                 running_loss += loss.item()
 
-            print(f"epoch {epoch}: loss-> {running_loss/len(train_loader)}")
+            print(f"epoch {epoch}: loss-> {running_loss / len(train_loader)}")
 
         model.eval()
 

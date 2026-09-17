@@ -93,7 +93,7 @@ def train_nn_model(split_name: str = "default") -> None:
 
                 running_loss += loss.item()
 
-            print(f"epoch {epoch}: loss {running_loss/len(train_loader)}")
+            print(f"epoch {epoch}: loss {running_loss / len(train_loader)}")
 
         x_test = transformer.transform(x_test)
         x_test_tensors = torch.from_numpy(x_test.toarray()).float()
